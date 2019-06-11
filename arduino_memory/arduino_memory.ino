@@ -1,19 +1,16 @@
 #include <Wire.h>
 #include "Adafruit_DRV2605.h"
-#include <SPI.h>                  //RF
-#include <MFRC522.h>              //RF
+#include <SPI.h>                  
+#include <MFRC522.h>              
 
-#define TCAADDR 0x70              //MP
+#define TCAADDR 0x70              
 #define RST_PIN   9     // SPI Reset Pin            RF
 #define SS_PIN    10    // SPI Slave Select Pin     RF
 
 namespace{
-   const uint32_t STEP_LENGTH_MS = 20; 
-   const uint8_t NUM_OF_MOTORS = 4; 
-   const uint8_t NUM_OF_STEPS = 12;
-   uint32_t num_of_steps, value;
-
    const uint8_t HIGH_VAL = 120, MIDDLE_VAL = 90, LOW_VAL = 60;
+   const uint8_t NUM_OF_MOTORS = 4; 
+   uint32_t num_of_steps, value;
    uint8_t pattern_scale[NUM_OF_MOTORS][25] = { 
      {10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200,210,220,230,240,250}
     ,{10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200,210,220,230,240,250}
@@ -231,36 +228,6 @@ void seq_run_p(uint8_t *pattern, uint8_t num_of_motors, uint8_t num_of_steps, ui
                 m_ctrls[motor].go();
         } 
 }
-void seq_run(uint8_t pattern[NUM_OF_MOTORS][12]){
-    for ( uint32_t step = 0; step < NUM_OF_STEPS; step++) {
-        t_0 = millis();
-        for (uint8_t motor = 0; motor < NUM_OF_MOTORS; motor++) {
-                tcaselect(motor);
-                value = pattern[motor][step];
-                Serial.print("M");
-                Serial.print(motor);
-                Serial.print(" w/ Val");
-                Serial.println(value);
-                m_ctrls[motor].setRealtimeValue(value);
-              //m_ctrls[motor].setWaveform(0,value);
-              //m_ctrls[motor].setWaveform(1,0);
-                m_ctrls[motor].go();
-        } 
-            t_1 = millis();
-            while(t_1-t_0 < STEP_LENGTH_MS){
-                t_1 = millis();
-            }
-    }
-        Serial.println("RESETTING MOTORS!");
-        for (uint8_t motor = 0; motor < NUM_OF_MOTORS; motor++) {
-                tcaselect(motor);
-                value = 0;
-                m_ctrls[motor].setRealtimeValue(value);
-                m_ctrls[motor].setWaveform(0,value);
-                m_ctrls[motor].setWaveform(1,0);
-                m_ctrls[motor].go();
-        } 
-}
 
 void print_rfid_uid(){
     if (mfrc522.PICC_IsNewCardPresent() && mfrc522.PICC_ReadCardSerial() ) {
@@ -274,14 +241,16 @@ void print_rfid_uid(){
 }
 
 void loop(){
-//tcaselect(0);
-//value = 130;
-//m_ctrls[0].setRealtimeValue(value);
-//m_ctrls[0].setWaveform(0,value);
-//m_ctrls[0].setWaveform(1,0);
-//m_ctrls[0].go();
+    //Needed for "Resetting" Motor 0
+    //tcaselect(0);
+    //value = 130;
+    //m_ctrls[0].setRealtimeValue(value);
+    //m_ctrls[0].setWaveform(0,value);
+    //m_ctrls[0].setWaveform(1,0);
+    //m_ctrls[0].go();
 
-        print_rfid_uid();
+    //print_rfid_uid();
+
       // PICC = proximity integrated circuit card = kontaktlose Chipkarte
     if (mfrc522.PICC_IsNewCardPresent() && mfrc522.PICC_ReadCardSerial() ) {
         Serial.println("SEARCHING FOR CARD");
@@ -289,8 +258,7 @@ void loop(){
         {
         case 0:
             Serial.println("CARD 1!");
-            //seq_run(pattern);
-            //seq_run_p((uint8_t*)pattern_scale,4,25,500,1);
+            seq_run_p((uint8_t*)pattern_scale,4,25,500,1);
             /* code */
             break;
         case 1:
@@ -303,15 +271,12 @@ void loop(){
             break;
         case 2:
             Serial.println("CARD 3!");
-            //seq_run_p((uint8_t*)pattern_rising_up,4,7,250,3);
-
             for (uint8_t i = 0; i < 3; i++)
             {
                 seq_run_p((uint8_t*)pattern_location_0,4,1,250,1);
                 seq_run_p((uint8_t*)pattern_rising_up_clear,4,4,250,1);
                 delay(200);
             }
-            /* code */
             break;
         case 3:
             Serial.println("CARD 4!");
