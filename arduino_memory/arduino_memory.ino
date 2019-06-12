@@ -6,7 +6,7 @@
 #define TCAADDR 0x70              
 #define RST_PIN   9     // SPI Reset Pin            RF
 #define SS_PIN    10    // SPI Slave Select Pin     RF
-
+#define SERIAL 0
 namespace{
    const uint8_t HIGH_VAL = 120, MIDDLE_VAL = 90, LOW_VAL = 60;
    const uint8_t NUM_OF_MOTORS = 4; 
@@ -150,9 +150,10 @@ void tcaselect(uint8_t i) {             //MP
 void setup(){
     //while(!Serial);
     delay(1000);
+    if(SERIAL){
     Serial.begin(9600);
-
     Serial.println("Program started!");
+    }
   for (uint8_t i = 0; i < NUM_OF_MOTORS; i++)
   {
        tcaselect(i);
@@ -169,10 +170,13 @@ void setup(){
   //m_ctrl.setMode(DRV2605_MODE_REALTIME);
   //Serial.println("Set to Realtime Mode");
     
-    Serial.println("Motor Controller initiated!");
     SPI.begin();        // Initialisiere SPI Kommunikation  RF
     mfrc522.PCD_Init();  // Initialisiere MFRC522 Lesemodul  RF
-    Serial.println("READY!");
+    if(SERIAL){
+        Serial.println("Motor Controller initiated!");
+        Serial.println("RDID  initiated!");
+        Serial.println("READY!");
+    }
 }
 
 uint8_t is_scanned_tag(byte tag[7]){
@@ -202,10 +206,12 @@ void seq_run_p(uint8_t *pattern, uint8_t num_of_motors, uint8_t num_of_steps, ui
                     tcaselect(motor);
                     value = *((pattern+motor*num_of_steps) + step);
 
+                if(SERIAL){
                     Serial.print("M");
                     Serial.print(motor);
                     Serial.print(" w/ Val");
                     Serial.println(value);
+                }
 
                     m_ctrls[motor].setRealtimeValue(value);
                     //m_ctrls[motor].setWaveform(0,value);
@@ -218,7 +224,9 @@ void seq_run_p(uint8_t *pattern, uint8_t num_of_motors, uint8_t num_of_steps, ui
                 }
         }
     }
-        Serial.println("RESETTING MOTORS!");
+        if(SERIAL){
+            Serial.println("RESETTING MOTORS!");
+        }
         for (uint8_t motor = 0; motor < NUM_OF_MOTORS; motor++) {
                 tcaselect(motor);
                 value = 0;
@@ -230,7 +238,7 @@ void seq_run_p(uint8_t *pattern, uint8_t num_of_motors, uint8_t num_of_steps, ui
 }
 
 void print_rfid_uid(){
-    if (mfrc522.PICC_IsNewCardPresent() && mfrc522.PICC_ReadCardSerial() ) {
+    if (SERIAL && mfrc522.PICC_IsNewCardPresent() && mfrc522.PICC_ReadCardSerial() ) {
         Serial.print("Gelesene UID:");
         for (byte i = 0; i < mfrc522.uid.size; i++) {
             Serial.print(mfrc522.uid.uidByte[i] < 0x10 ? " 0" : " ");
@@ -251,16 +259,22 @@ void loop(){
 
       // PICC = proximity integrated circuit card = kontaktlose Chipkarte
     if (mfrc522.PICC_IsNewCardPresent() && mfrc522.PICC_ReadCardSerial() ) {
-        Serial.println("SEARCHING FOR CARD");
+        if(SERIAL){
+            Serial.println("SEARCHING FOR CARD");
+        }
         switch (get_scanned_tag_index())
         {
         case 0:
-            Serial.println("CARD 1!");
+            if(SERIAL){
+                Serial.println("CARD 1!");
+            }
             seq_run_p((uint8_t*)pattern_scale,4,25,500,1);
             /* code */
             break;
         case 1:
-            Serial.println("CARD 2!");
+            if(SERIAL){
+                Serial.println("CARD 2!");
+            }
             for (uint8_t i = 0; i < 3; i++)
             {
                 seq_run_p((uint8_t*)pattern_location_0,4,1,100,1);
@@ -268,7 +282,10 @@ void loop(){
             }
             break;
         case 2:
-            Serial.println("CARD 3!");
+            if(SERIAL){
+
+                Serial.println("CARD 3!");
+            }
             for (uint8_t i = 0; i < 3; i++)
             {
                 seq_run_p((uint8_t*)pattern_location_0,4,1,250,1);
@@ -277,7 +294,10 @@ void loop(){
             }
             break;
         case 3:
-            Serial.println("CARD 4!");
+            if(SERIAL){
+
+                Serial.println("CARD 4!");
+            }
             for (uint8_t i = 0; i < 3; i++)
             {
                 seq_run_p((uint8_t*)pattern_location_1,4,1,100,1);
@@ -285,7 +305,9 @@ void loop(){
             }
             break;
         case 4:
-            Serial.println("CARD 5!");
+            if(SERIAL){
+                Serial.println("CARD 5!");
+            }
             for (uint8_t i = 0; i < 5; i++)
             {
                 seq_run_p((uint8_t*)pattern_location_0,4,1,100,1);
@@ -300,52 +322,80 @@ void loop(){
             /* code */
             break;
         case 5:
-            Serial.println("CARD 6!");
+            if(SERIAL){
+                Serial.println("CARD 6!");
+            }
                 seq_run_p((uint8_t*)pattern_collecting_at_top,4,21,100,1);
             /* code */
             break;
         case 6:
             /* code */
-            Serial.println("CARD 7!");
+            if(SERIAL){
+                Serial.println("CARD 7!");
+            }
             break;
         case 7:
-            Serial.println("CARD 8!");
+            if(SERIAL){
+                Serial.println("CARD 8!");
+            }
             /* code */
             break;
         case 8:
-            Serial.println("CARD 9!");
+            if(SERIAL){
+                Serial.println("CARD 9!");
+            }
             /* code */
             break;
         case 9:
-            Serial.println("CARD 10!");
+            if(SERIAL){
+                Serial.println("CARD 10!");
+            }
             /* code */
             break;
         case 10:
+        if(SERIAL){
+
             Serial.println("CARD 11!");
+        }
             /* code */
             break;
         case 11:
+        if(SERIAL){
             Serial.println("CARD 12!");
+        }
             /* code */
             break;
         case 12:
+        if(SERIAL){
             Serial.println("CARD 13!");
+
+        }
             /* code */
             break;
         case 13:
+        if(SERIAL){
+
             Serial.println("CARD 14!");
+        }
             /* code */
             break;
         case 14:
+        if(SERIAL){
             Serial.println("CARD 15!");
+        }
             /* code */
             break;
         case 15:
+        if(SERIAL){
+
             Serial.println("CARD 16!");
+        }
             /* code */
             break;
         default:
+        if(SERIAL){
             Serial.println("CARD NOT FOUND!");
+        }
             break;
         }
 
