@@ -153,14 +153,14 @@ void setup(){
     Serial.begin(9600);
 
     Serial.println("Program started!");
-//for (uint8_t i = 0; i < NUM_OF_MOTORS; i++)
-//{
-//     tcaselect(i);
-//    // m_ctrl.begin();
-//    m_ctrls[i].begin();
-//    m_ctrls[i].selectLibrary(1);
-//    m_ctrls[i].setMode(DRV2605_MODE_REALTIME);
-//}
+  for (uint8_t i = 0; i < NUM_OF_MOTORS; i++)
+  {
+       tcaselect(i);
+      // m_ctrl.begin();
+      m_ctrls[i].begin();
+      m_ctrls[i].selectLibrary(1);
+      m_ctrls[i].setMode(DRV2605_MODE_REALTIME);
+  }
   
   //m_ctrl.begin();
   //Serial.println("m_ctrl.begin() executed");
@@ -248,8 +248,6 @@ void loop(){
     //m_ctrls[0].setWaveform(0,value);
     //m_ctrls[0].setWaveform(1,0);
     //m_ctrls[0].go();
-
-    //print_rfid_uid();
 
       // PICC = proximity integrated circuit card = kontaktlose Chipkarte
     if (mfrc522.PICC_IsNewCardPresent() && mfrc522.PICC_ReadCardSerial() ) {
