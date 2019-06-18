@@ -6,103 +6,10 @@
 #define TCAADDR 0x70              
 #define RST_PIN   9     // SPI Reset Pin            RF
 #define SS_PIN    10    // SPI Slave Select Pin     RF
-#define SERIAL 0
+#define SERIAL 1
 namespace{
-   const uint8_t HIGH_VAL = 120, MIDDLE_VAL = 90, LOW_VAL = 60;
+   const uint8_t HIG = 120, MID = 90, LOW_V = 60;
    const uint8_t NUM_OF_MOTORS = 4; 
-   uint32_t num_of_steps, value;
-   uint8_t pattern_scale[NUM_OF_MOTORS][25] = { 
-     {10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200,210,220,230,240,250}
-    ,{10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200,210,220,230,240,250}
-    ,{10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200,210,220,230,240,250}
-    ,{10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200,210,220,230,240,250}
-    };
-
-
-    uint8_t pattern_pyramid[NUM_OF_MOTORS][6] = {
-       {40 ,60  ,0  ,0 ,0 ,0},
-       {0  ,60  ,80 ,100 ,120 ,0},
-       {0  ,60  ,80 ,0 ,0 ,0},
-       {40 ,60  ,0 ,0 ,0 ,0}
-    };
-
-
-    uint8_t pattern_location_0[NUM_OF_MOTORS][1] = {
-       {HIGH_VAL},
-       {0  },
-       {0  },
-       {0 }
-    };
-
-    uint8_t pattern_location_1[NUM_OF_MOTORS][1] = {
-       {0  },
-       {HIGH_VAL},
-       {0  },
-       {0 }
-    };
-
-    uint8_t pattern_location_2[NUM_OF_MOTORS][1] = {
-       {0  },
-       {0  },
-       {HIGH_VAL},
-       {0 }
-    };
-
-    uint8_t pattern_location_3[NUM_OF_MOTORS][1] = {
-       {0  },
-       {0  },
-       {0 },
-       {HIGH_VAL}
-    };
-    uint8_t pattern_falling_down[NUM_OF_MOTORS][1] = {
-       {HIGH_VAL},
-       {0  },
-       {0  },
-       {0 }
-    };
-
-
-    uint8_t pattern_rising_up[NUM_OF_MOTORS][7] = {
-       {HIGH_VAL,MIDDLE_VAL ,0  ,0 ,0 ,0,0},
-       {0  ,MIDDLE_VAL ,HIGH_VAL,MIDDLE_VAL,0 ,0,0},
-       {0  ,0  ,0  ,MIDDLE_VAL,HIGH_VAL,MIDDLE_VAL,0},
-       {0  ,0  ,0  ,0 ,0 ,MIDDLE_VAL,HIGH_VAL}
-    };
-
-    uint8_t pattern_rising_up_clear[NUM_OF_MOTORS][4] = {
-       {HIGH_VAL,0 ,0  ,0},
-       {0  ,HIGH_VAL ,0,0},
-       {0  ,0 ,HIGH_VAL,0},
-       {0  ,0  ,0 ,HIGH_VAL}
-       };
-
-    uint8_t pattern_rising_down[NUM_OF_MOTORS][7] = {
-       {0  ,0  ,0  ,0 ,0 ,MIDDLE_VAL,HIGH_VAL},
-       {0  ,0  ,0  ,MIDDLE_VAL,HIGH_VAL,MIDDLE_VAL,0},
-       {0  ,MIDDLE_VAL ,HIGH_VAL,MIDDLE_VAL,0 ,0,0},
-       {HIGH_VAL,MIDDLE_VAL ,0  ,0 ,0 ,0,0}
-    };
-
-   uint8_t pattern[NUM_OF_MOTORS][12] = { 
-        {180,180,0,0,0,0,0,0,0,0,180,180}
-       ,{0,0,180,180,0,0,0,0,0,0,180,180}
-       ,{0,0,0,0,180,180,0,0,0,0,180,180}
-       ,{0,0,0,0,0,0,180,180,0,0,180,180}
-   } ;
-
-    uint8_t pattern_collecting_at_top[NUM_OF_MOTORS][21] = {
-       {LOW_VAL,LOW_VAL ,0  ,0 ,0 ,0,0,LOW_VAL,LOW_VAL ,0  ,0 ,0 ,0,0,LOW_VAL,LOW_VAL ,0  ,0 ,0 ,0,0},
-       {0  ,LOW_VAL ,LOW_VAL,LOW_VAL,0 ,0,0,0  ,LOW_VAL ,LOW_VAL,LOW_VAL,0 ,0,0,0  ,LOW_VAL ,LOW_VAL,LOW_VAL,0 ,0,0},
-       {0  ,0  ,0  ,LOW_VAL,LOW_VAL,LOW_VAL,0,0  ,0  ,0  ,LOW_VAL,LOW_VAL,LOW_VAL,0,0  ,0  ,0  ,LOW_VAL,LOW_VAL,LOW_VAL,0},
-       {0  ,0  ,0  ,0 ,0 ,LOW_VAL,LOW_VAL,LOW_VAL  ,LOW_VAL  ,LOW_VAL  ,LOW_VAL ,LOW_VAL ,LOW_VAL,MIDDLE_VAL,MIDDLE_VAL  ,MIDDLE_VAL  ,MIDDLE_VAL  ,MIDDLE_VAL ,MIDDLE_VAL ,MIDDLE_VAL,HIGH_VAL}
-    };
-
-   uint8_t pattern_dance[NUM_OF_MOTORS][12] = { 
-       {0,0,0,0,0,0,0,0,0,0,0,0}
-       ,{0,0,0,0,0,0,0,0,0,0,0,0}
-       ,{0,0,0,0,0,0,0,0,0,0,0,0}
-       ,{0,0,0,0,0,0,0,0,0,0,0,0}
-   } ;
 
    uint8_t m = 0;
    uint32_t t_0, t_1;
@@ -111,6 +18,164 @@ namespace{
    Adafruit_DRV2605 m_ctrl;
    Adafruit_DRV2605 m_ctrls[NUM_OF_MOTORS];
    MFRC522 mfrc522(SS_PIN, RST_PIN);   // Instanz des MFRC522 erzeugen   RF
+   uint32_t num_of_steps, value;
+    uint8_t pattern_scale[NUM_OF_MOTORS][25] = { 
+        {10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,HIG,190,200,210,220,230,240,250}
+        ,{10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,HIG,190,200,210,220,230,240,250}
+        ,{10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,HIG,190,200,210,220,230,240,250}
+        ,{10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,HIG,190,200,210,220,230,240,250}
+        };
+    uint8_t pattern_collecting_at_top[NUM_OF_MOTORS][21] = {
+        {LOW_V,LOW_V,0  ,0  ,0  ,0  ,0  ,LOW_V,LOW_V,0  ,0  ,0  ,0  ,0  ,LOW_V,LOW_V,0  ,0  ,0  ,0  ,0},
+        {0  ,LOW_V,LOW_V,LOW_V,0  ,0  ,0  ,0  ,LOW_V,LOW_V,LOW_V,0  ,0  ,0  ,0  ,LOW_V,LOW_V,LOW_V,0  ,0  ,0},
+        {0  ,0  ,0  ,LOW_V,LOW_V,LOW_V,0  ,0  ,0  ,0  ,LOW_V,LOW_V,LOW_V,0  ,0  ,0  ,0  ,LOW_V,LOW_V,LOW_V,0},
+        {0  ,0  ,0  ,0  ,0  ,LOW_V,LOW_V,LOW_V,LOW_V,LOW_V,LOW_V,LOW_V,LOW_V,MID,MID,MID,MID,MID,MID,MID,HIG}
+        };
+
+    uint8_t pattern_rising_up[NUM_OF_MOTORS][7] = {
+       {HIG ,MID ,0   ,0   ,0  ,0   ,0},
+       {0   ,MID ,HIG ,MID ,0  ,0   ,0},
+       {0   ,0   ,0   ,MID ,HIG,MID ,0},
+       {0   ,0   ,0   ,0   ,0  ,MID ,HIG}
+    };
+
+    uint8_t pattern_collect[NUM_OF_MOTORS][11] = {
+       {HIG ,0  ,0   ,0  ,HIG,0  ,0  ,HIG,0  ,HIG,HIG},
+       {0   ,HIG,0   ,0  ,0  ,HIG,0  ,0  ,HIG,HIG,HIG},
+       {0   ,0  ,HIG ,0  ,0  ,0  ,HIG,HIG,HIG,HIG,HIG},
+       {0   ,0  ,0   ,HIG,HIG,HIG,HIG,HIG,HIG,HIG,HIG}
+    };
+
+    uint8_t pattern_double_rise[NUM_OF_MOTORS][9] = {
+       {HIG ,0  ,0   ,0  ,0,HIG,0  ,0   ,0},
+       {0   ,HIG,0   ,0  ,0,0  ,HIG,0   ,0},
+       {0   ,0  ,HIG ,0  ,0,0  ,0  ,HIG ,0},
+       {0   ,0  ,0   ,HIG,0,0  ,0  ,0   ,HIG}
+    };
+
+    uint8_t pattern[NUM_OF_MOTORS][12] = { 
+         {HIG,HIG,0,0,0,0,0,0,0,0,HIG,HIG}
+        ,{0,0,HIG,HIG,0,0,0,0,0,0,HIG,HIG}
+        ,{0,0,0,0,HIG,HIG,0,0,0,0,HIG,HIG}
+        ,{0,0,0,0,0,0,HIG,HIG,0,0,HIG,HIG}
+    };
+    uint8_t pattern_updown[NUM_OF_MOTORS][13] = { 
+        {0 ,20 ,40 ,60 ,80 ,100 ,120 ,100 ,80 ,60 ,40 ,20 ,0 },
+        {0 ,20 ,40 ,60 ,80 ,100 ,120 ,100 ,80 ,60 ,40 ,20 ,0 },
+        {0 ,20 ,40 ,60 ,80 ,100 ,120 ,100 ,80 ,60 ,40 ,20 ,0 },
+        {0 ,20 ,40 ,60 ,80 ,100 ,120 ,100 ,80 ,60 ,40 ,20 ,0 }
+    };
+   uint8_t pattern_inout[NUM_OF_MOTORS][6] = { 
+        {HIG,0  ,HIG,0  ,HIG,0}
+       ,{0  ,HIG,0  ,HIG,0  ,HIG}
+       ,{0  ,HIG,0  ,HIG,0  ,HIG}
+       ,{HIG,0  ,HIG,0  ,HIG,0}
+   };
+
+   uint8_t pattern_inout_double[NUM_OF_MOTORS][8] = { 
+        {HIG,HIG,0  ,0  ,HIG,HIG,0  ,0  }
+       ,{0  ,0  ,HIG,HIG,0  ,0  ,HIG,HIG}
+       ,{0  ,0  ,HIG,HIG,0  ,0  ,HIG,HIG}
+       ,{HIG,HIG,0  ,0  ,HIG,HIG,0  ,0  }
+   };
+
+    uint8_t pattern_pulse[NUM_OF_MOTORS][5] = {
+       {0   ,MID  ,HIG  ,MID ,0},
+       {MID ,HIG  ,HIG  ,HIG ,MID},
+       {MID ,HIG  ,HIG  ,HIG ,MID},
+       {0   ,MID  ,HIG  ,MID ,0}
+    };
+    uint8_t pattern_zigzag[NUM_OF_MOTORS][5] = {
+       {HIG ,0   ,HIG ,0   ,HIG},
+       {0   ,HIG ,0   ,HIG ,0  },
+       {HIG ,0   ,HIG ,0   ,HIG},
+       {0   ,HIG ,0   ,HIG ,0  }
+    };
+    uint8_t HI7 = HIG/7;
+
+    uint8_t pattern_sidewave[NUM_OF_MOTORS][7] = {
+       {HI7  ,HI7*2,HI7*3,HI7*4,HI7*5},
+       {HI7*2,HI7*3,HI7*4,HI7*5,HI7*6},
+       {HI7*3,HI7*4,HI7*5,HI7*6,HIG},
+       {HI7*4,HI7*5,HI7*6,HIG ,0  }
+    };
+    uint8_t pattern_every_other[NUM_OF_MOTORS][5] = {
+       {HIG ,0 ,HIG ,0 ,HIG},
+       {HIG ,0 ,HIG ,0 ,HIG},
+       {HIG ,0 ,HIG ,0 ,HIG},
+       {HIG ,0 ,HIG ,0 ,HIG}
+    };
+
+
+
+    
+    uint8_t pattern_pyramid[NUM_OF_MOTORS][6] = {
+       {40 ,60  ,0  ,0  ,0  ,0},
+       {0  ,60  ,80 ,100,120,0},
+       {0  ,60  ,80 ,0  ,0  ,0},
+       {40 ,60  ,0  ,0  ,0  ,0}
+    };
+
+
+
+    uint8_t pattern_location_0[NUM_OF_MOTORS][1] = {
+       {HIG},
+       {0  },
+       {0  },
+       {0 }
+    };
+
+    uint8_t pattern_location_1[NUM_OF_MOTORS][1] = {
+       {0  },
+       {HIG},
+       {0  },
+       {0 }
+    };
+
+    uint8_t pattern_location_2[NUM_OF_MOTORS][1] = {
+       {0  },
+       {0  },
+       {HIG},
+       {0 }
+    };
+
+    uint8_t pattern_location_3[NUM_OF_MOTORS][1] = {
+       {0  },
+       {0  },
+       {0 },
+       {HIG}
+    };
+    uint8_t pattern_falling_down[NUM_OF_MOTORS][1] = {
+       {HIG},
+       {0  },
+       {0  },
+       {0 }
+    };
+
+
+
+    uint8_t pattern_rising_up_clear[NUM_OF_MOTORS][4] = {
+       {HIG,0 ,0  ,0},
+       {0  ,HIG ,0,0},
+       {0  ,0 ,HIG,0},
+       {0  ,0  ,0 ,HIG}
+       };
+
+    uint8_t pattern_rising_down[NUM_OF_MOTORS][7] = {
+       {0  ,0  ,0  ,0 ,0 ,MID,HIG},
+       {0  ,0  ,0  ,MID,HIG,MID,0},
+       {0  ,MID ,HIG,MID,0 ,0,0},
+       {HIG,MID ,0  ,0 ,0 ,0,0}
+    };
+
+
+   uint8_t pattern_dance[NUM_OF_MOTORS][12] = { 
+       {0,0,0,0,0,0,0,0,0,0,0,0}
+       ,{0,0,0,0,0,0,0,0,0,0,0,0}
+       ,{0,0,0,0,0,0,0,0,0,0,0,0}
+       ,{0,0,0,0,0,0,0,0,0,0,0,0}
+   } ;
+
 
    byte uids[16][7] = {
         { 0x04,0x20,0x39,0xD2,0xF2,0x62,0x81}, //1
@@ -148,28 +213,34 @@ void tcaselect(uint8_t i) {             //MP
 }
 
 void setup(){
-    //while(!Serial);
-    delay(1000);
     if(SERIAL){
     Serial.begin(9600);
     Serial.println("Program started!");
     }
+
+    if(SERIAL){
+    Serial.begin(9600);
+    Serial.println("Program started!");
+    Serial.println("Starting Motor init");
+    }
+
   for (uint8_t i = 0; i < NUM_OF_MOTORS; i++)
   {
-       tcaselect(i);
-      // m_ctrl.begin();
+    if(SERIAL){
+        Serial.print("Motor ");
+        Serial.print(i);
+        Serial.println(" initiation begins!");
+    }
+      tcaselect(i);
       m_ctrls[i].begin();
       m_ctrls[i].selectLibrary(1);
       m_ctrls[i].setMode(DRV2605_MODE_REALTIME);
+    if(SERIAL){
+        Serial.print("Motor ");
+        Serial.print(i);
+        Serial.println(" initiated!");
+    }
   }
-  
-  //m_ctrl.begin();
-  //Serial.println("m_ctrl.begin() executed");
-  //m_ctrl.selectLibrary(1);
-  //Serial.println("m_ctrl.selectLibrary(1) executed");
-  //m_ctrl.setMode(DRV2605_MODE_REALTIME);
-  //Serial.println("Set to Realtime Mode");
-    
     SPI.begin();        // Initialisiere SPI Kommunikation  RF
     mfrc522.PCD_Init();  // Initialisiere MFRC522 Lesemodul  RF
     if(SERIAL){
@@ -250,12 +321,12 @@ void print_rfid_uid(){
 
 void loop(){
     //Needed for "Resetting" Motor 0
-    //tcaselect(0);
-    //value = 130;
-    //m_ctrls[0].setRealtimeValue(value);
-    //m_ctrls[0].setWaveform(0,value);
-    //m_ctrls[0].setWaveform(1,0);
-    //m_ctrls[0].go();
+//    tcaselect(0);
+//    value = 130;
+//    m_ctrls[0].setRealtimeValue(value);
+//    m_ctrls[0].setWaveform(0,value);
+//    m_ctrls[0].setWaveform(1,0);
+//    m_ctrls[0].go();
 
       // PICC = proximity integrated circuit card = kontaktlose Chipkarte
     if (mfrc522.PICC_IsNewCardPresent() && mfrc522.PICC_ReadCardSerial() ) {
@@ -268,14 +339,19 @@ void loop(){
             if(SERIAL){
                 Serial.println("CARD 1!");
             }
-            seq_run_p((uint8_t*)pattern_scale,4,25,500,1);
+            //seq_run_p((uint8_t*)pattern_scale,4,25,500,1);
+            for (uint8_t i = 0; i < 5; i++)
+            {
+                seq_run_p((uint8_t*)pattern_location_0,4,1,100,1);
+                delay(200);
+            }
             /* code */
             break;
         case 1:
             if(SERIAL){
                 Serial.println("CARD 2!");
             }
-            for (uint8_t i = 0; i < 3; i++)
+            for (uint8_t i = 0; i < 5; i++)
             {
                 seq_run_p((uint8_t*)pattern_location_0,4,1,100,1);
                 delay(200);
@@ -286,7 +362,7 @@ void loop(){
 
                 Serial.println("CARD 3!");
             }
-            for (uint8_t i = 0; i < 3; i++)
+            for (uint8_t i = 0; i < 2; i++)
             {
                 seq_run_p((uint8_t*)pattern_location_0,4,1,250,1);
                 seq_run_p((uint8_t*)pattern_rising_up_clear,4,4,250,1);
@@ -298,9 +374,10 @@ void loop(){
 
                 Serial.println("CARD 4!");
             }
-            for (uint8_t i = 0; i < 3; i++)
+            for (uint8_t i = 0; i < 2; i++)
             {
-                seq_run_p((uint8_t*)pattern_location_1,4,1,100,1);
+                seq_run_p((uint8_t*)pattern_location_0,4,1,250,1);
+                seq_run_p((uint8_t*)pattern_rising_up_clear,4,4,250,1);
                 delay(200);
             }
             break;
@@ -308,7 +385,7 @@ void loop(){
             if(SERIAL){
                 Serial.println("CARD 5!");
             }
-            for (uint8_t i = 0; i < 5; i++)
+            for (uint8_t i = 0; i < 2; i++)
             {
                 seq_run_p((uint8_t*)pattern_location_0,4,1,100,1);
                 seq_run_p((uint8_t*)pattern_rising_up,4,7,100,1);
@@ -325,7 +402,18 @@ void loop(){
             if(SERIAL){
                 Serial.println("CARD 6!");
             }
-                seq_run_p((uint8_t*)pattern_collecting_at_top,4,21,100,1);
+            //    seq_run_p((uint8_t*)pattern_collecting_at_top,4,21,100,1);
+            for (uint8_t i = 0; i < 2; i++)
+            {
+                seq_run_p((uint8_t*)pattern_location_0,4,1,100,1);
+                seq_run_p((uint8_t*)pattern_rising_up,4,7,100,1);
+                seq_run_p((uint8_t*)pattern_location_3,4,1,100,1);
+                delay(250);
+                seq_run_p((uint8_t*)pattern_location_3,4,1,100,1);
+                seq_run_p((uint8_t*)pattern_rising_down,4,7,100,1);
+                seq_run_p((uint8_t*)pattern_location_0,4,1,100,1);
+                delay(250);
+            }
             /* code */
             break;
         case 6:
@@ -333,23 +421,37 @@ void loop(){
             if(SERIAL){
                 Serial.println("CARD 7!");
             }
+            seq_run_p((uint8_t*)pattern_updown,4,12,100,1);
             break;
         case 7:
             if(SERIAL){
                 Serial.println("CARD 8!");
             }
+            seq_run_p((uint8_t*)pattern_updown,4,12,100,1);
             /* code */
             break;
         case 8:
             if(SERIAL){
                 Serial.println("CARD 9!");
             }
-            /* code */
+            for (uint8_t i = 0; i < 5; i++)
+            {
+                seq_run_p((uint8_t*)pattern_location_1,4,1,100,1);
+                delay(200);
+            }
+            //seq_run_p((uint8_t*)pattern_inout_double,4,8,100,1);
             break;
         case 9:
             if(SERIAL){
                 Serial.println("CARD 10!");
             }
+            
+            for (uint8_t i = 0; i < 5; i++)
+            {
+                seq_run_p((uint8_t*)pattern_location_1,4,1,100,1);
+                delay(200);
+            }
+            //seq_run_p((uint8_t*)pattern_pulse,4,5,300,1);
             /* code */
             break;
         case 10:
@@ -357,12 +459,15 @@ void loop(){
 
             Serial.println("CARD 11!");
         }
+            //seq_run_p((uint8_t*)pattern_zigzag,4,5,500,1);
+            seq_run_p((uint8_t*)pattern_sidewave,4,7,100,1);
             /* code */
             break;
         case 11:
         if(SERIAL){
             Serial.println("CARD 12!");
         }
+            seq_run_p((uint8_t*)pattern_sidewave,4,7,100,1);
             /* code */
             break;
         case 12:
@@ -370,6 +475,11 @@ void loop(){
             Serial.println("CARD 13!");
 
         }
+        for (uint8_t i = 0; i < 2; i++)
+        {
+            seq_run_p((uint8_t*)pattern_every_other,4,5,100,1);
+        }
+        
             /* code */
             break;
         case 13:
@@ -377,12 +487,17 @@ void loop(){
 
             Serial.println("CARD 14!");
         }
+        for (uint8_t i = 0; i < 2; i++)
+        {
+            seq_run_p((uint8_t*)pattern_every_other,4,5,100,1);
+        }
             /* code */
             break;
         case 14:
         if(SERIAL){
             Serial.println("CARD 15!");
         }
+            seq_run_p((uint8_t*)pattern_inout,4,6,300,1);
             /* code */
             break;
         case 15:
@@ -390,16 +505,16 @@ void loop(){
 
             Serial.println("CARD 16!");
         }
+            seq_run_p((uint8_t*)pattern_inout,4,6,300,1);
             /* code */
             break;
         default:
-        if(SERIAL){
-            Serial.println("CARD NOT FOUND!");
-        }
+            if(SERIAL){
+                Serial.println("CARD NOT FOUND!");
+            }
             break;
         }
-
-    } 
+    }
     // Versetzt die gelesene Karte in einen Ruhemodus, um nach anderen Karten suchen zu können.
     mfrc522.PICC_HaltA();
   }
